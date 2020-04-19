@@ -29,3 +29,7 @@ mybatis:
     map-underscore-to-camel-case: true
     use-generated-keys: true
     use-column-label: true
+
+logging:
+  level:
+    com.seckill.dao.*: debug
