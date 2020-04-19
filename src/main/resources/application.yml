@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    show-sql: true
+    database: mysql
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/seckill?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 20
+      max-lifetime: 30000
+      idle-timeout: 30000
+      data-source-properties:
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        cachePrepStmts: true
+        useServerPrepStmts: true
+    name: seckill
+
+  redis:
+    host: 192.168.0.222
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.seckill.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    use-generated-keys: true
+    use-column-label: true
