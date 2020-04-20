@@ -88,6 +88,7 @@ public class SeckillServiceImpl implements SeckillService {
      * 3：不是所有的方法都需要事务，如：只有一条修改操作，只读操作不需要事务控制。
      */
     @Override
+    // 若不加rollbackFor默认是只有在运行期异常时才回滚，加上后事务遇到非运行时异常也会回滚
     @Transactional(rollbackFor = Exception.class)
     public SeckillExecution executeSeckill(long seckillId, long userPhone, String md5) throws SeckillException, RepeatKillException, SeckillCloseException {
         // 首先判断md5是否合法，不合法抛出异常
