@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>秒杀列表</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">
+            <h2>秒杀</h2>
+            <h3 id="loginPhone"></h3>
+            <button id="clearCook" class="btn btn-info">清除cookies</button>
+        </div>
+        <div class="panel-body">
+            <table class="table able-hover">
+                <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>库存</th>
+                    <th>开始时间</th>
+                    <th>结束时间</th>
+                    <th>创建时间</th>
+                    <th>详情页</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="sk:${list}">
+                    <td th:text="${sk.name}"></td>
+                    <td th:text="${sk.number}"></td>
+                    <td th:text="${#dates.format(sk.startTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${#dates.format(sk.endTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${#dates.format(sk.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td><a class="btn btn-info" th:href="${'/seckill/' + sk.seckillId + '/detail'}">></a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
