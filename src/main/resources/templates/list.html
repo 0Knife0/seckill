@@ -42,5 +42,77 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title" id="myModalLabel">
+                    秒杀电话（必填）
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-8 col-xs-offset-2">
+                        <input type="text" name="killPhone" id="killPhoneKey" placeholder="填写手机号^o^"
+                               class="form-control"/>
+                    </div>
+                    <div class="col-xs-8 col-xs-offset-2">
+                        <span id="inputMessage"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="killPhoneBtn" class="btn btn-success">
+                    <span class="glyphicon glyphicon-phone"></span>确定
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
 </body>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    //验证手机号、直接判断对象会看对象是否为空,空就是undefine就是false; isNaN 非数字返回true
+    function validatePhone(phone) {
+        return !!(phone && phone.length === 11 && !isNaN(phone));
+    }
+
+    var userPhone = $.cookie('userPhone');
+    $('#loginPhone').html('<h4 class="h4">登录手机号:' + userPhone + '</h4>');
+
+    $('#clearCook').click(function () {
+        $.cookie("userPhone", null, {path: '/seckill'});
+        var killPhoneModal = $('#myModal');
+        killPhoneModal.modal({
+            show: true,
+            keyboard: false,
+            backdrop: 'static'
+        });
+    });
+
+    $('#killPhoneBtn').click(function () {
+        var inputPhone = $('#killPhoneKey').val();
+        console.log("inputPhone: " + inputPhone);
+        if (validatePhone(inputPhone)) {
+            //电话写入cookie(7天过期)
+            $.cookie('userPhone', inputPhone, {expires: 7, path: '/seckill'});
+            //验证通过　　刷新页面
+            window.location.reload();
+        } else {
+            $('#inputMessage').html('<label class="label label-danger text-center">手机号错误!</label>').show(30);
+        }
+    });
+
+    if (userPhone == null) {
+        var killPhoneModal = $('#myModal');
+        killPhoneModal.modal({
+            show: true,
+            keyboard: false,
+            backdrop: 'static'
+        });
+    }
+
+    /*]]>*/
+</script>
 </html>
