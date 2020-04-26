@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface SeckillDao {
 
@@ -17,4 +18,6 @@ public interface SeckillDao {
     // 分页查询
     List<Seckill> findAll(@Param("offset") int offset,@Param("limit") int limit);
 
+    // 使用存储过程执行秒杀
+    void killByProcedure(Map<String, Object> map);
 }
