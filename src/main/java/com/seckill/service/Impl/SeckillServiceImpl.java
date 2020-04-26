@@ -52,7 +52,7 @@ public class SeckillServiceImpl implements SeckillService {
         // 使用redis进行优化
         Seckill seckill = redisDao.getSeckill(seckillId);
         // 缓存中没有
-        if (seckill == null){
+        if (seckill == null) {
             // 从数据库中拿
             seckill = seckillDao.findById(seckillId);
             // 判断seckill是否为空，防止空指针异常
@@ -107,22 +107,23 @@ public class SeckillServiceImpl implements SeckillService {
             throw new SeckillException("秒杀失败，涉嫌篡改数据");
         }
 
+        // 如果合法执行秒杀逻辑
+        // 秒杀逻辑：减库存、如果成功插入秒杀成功记录
+        Date nowTime = new Date();
         try {
-            // 如果合法执行秒杀逻辑
-            // 秒杀逻辑：减库存、如果成功插入秒杀成功记录
-            Date nowTime = new Date();
-            int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
-            if (updateCount <= 0) {
-                // 没有更新到记录，秒杀关闭了
-                throw new SeckillCloseException("秒杀结束了");
+            // 插入秒杀成功记录
+            int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone, (short) 1);
+            // 如果插入操作小于等于0，说明重复秒杀
+            if (insertCount <= 0) {
+                throw new RepeatKillException("重复秒杀");
             } else {
-                // 减库存成功，插入秒杀成功记录
-                int insertCount = successKilledDao.insertSuccessKilled(seckillId, userPhone, (short) 1);
-                // 如果插入操作小于等于0，说明重复秒杀
-                if (insertCount <= 0) {
-                    throw new RepeatKillException("重复秒杀");
+                // 减库存，热点商品竞争
+                int updateCount = seckillDao.reduceNumber(seckillId, nowTime);
+                if (updateCount <= 0) {
+                    // 没有更新到记录，秒杀关闭了
+                    throw new SeckillCloseException("秒杀结束了");
                 } else {
-                    // 秒杀成功
+                    // 秒杀成功 commit
                     SuccessKilled successKilled = successKilledDao.selectByIdWithSeckill(seckillId, userPhone);
                     return new SeckillExecution(seckillId, SeckillStateEnum.SUCCESS, successKilled);
                     /*return SeckillExecution.builder().seckillId(seckillId).
