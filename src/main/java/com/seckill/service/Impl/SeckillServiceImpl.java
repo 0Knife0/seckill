@@ -2,6 +2,7 @@ package com.seckill.service.Impl;
 
 import com.seckill.dao.SeckillDao;
 import com.seckill.dao.SuccessKilledDao;
+import com.seckill.dao.cache.RedisDao;
 import com.seckill.dto.Exposer;
 import com.seckill.dto.SeckillExecution;
 import com.seckill.entity.Seckill;
@@ -33,6 +34,9 @@ public class SeckillServiceImpl implements SeckillService {
     @Autowired
     private SuccessKilledDao successKilledDao;
 
+    @Autowired
+    private RedisDao redisDao;
+
     @Override
     public Seckill getById(long seckillId) {
         return seckillDao.findById(seckillId);
@@ -45,14 +49,21 @@ public class SeckillServiceImpl implements SeckillService {
 
     @Override
     public Exposer exportSeckillUrl(long seckillId) {
-        // 通过seckillId拿到秒杀项目seckill对象
-        Seckill seckill = seckillDao.findById(seckillId);
-
-        // 判断seckill是否为空，防止空指针异常
-        if (seckill == null) {
-            // 如果为空，返回false并返回秒杀项目id
-            return new Exposer(false, seckillId);
-            //return Exposer.builder().exposed(false).seckillId(seckillId).build();
+        // 使用redis进行优化
+        Seckill seckill = redisDao.getSeckill(seckillId);
+        // 缓存中没有
+        if (seckill == null){
+            // 从数据库中拿
+            seckill = seckillDao.findById(seckillId);
+            // 判断seckill是否为空，防止空指针异常
+            if (seckill == null) {
+                // 如果为空，返回false并返回秒杀项目id
+                return new Exposer(false, seckillId);
+                //return Exposer.builder().exposed(false).seckillId(seckillId).build();
+            } else {
+                // 放入缓存
+                redisDao.putSeckill(seckill);
+            }
         }
 
         // 如果不为空，拿到秒杀项目的开始时间和结束时间

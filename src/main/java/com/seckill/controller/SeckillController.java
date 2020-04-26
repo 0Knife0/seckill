@@ -54,6 +54,13 @@ public class SeckillController {
     @ResponseBody
     @PostMapping("/{seckillId}/exposer")
     public SeckillResult<Exposer> exposer(@PathVariable Long seckillId) {
+        /**
+         * 先试用seckillId查redis中是否有数据
+         * 有：直接返回
+         * 没有：从mysql中取出，并放入redis中
+         */
+
+
         SeckillResult<Exposer> result;
         try {
             Exposer exposer = seckillService.exportSeckillUrl(seckillId);
